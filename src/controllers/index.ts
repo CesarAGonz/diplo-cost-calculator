@@ -1,4 +1,4 @@
 export * from './ping.controller';
-export * from './zone.controller';
-export * from './cupon.controller';
-export * from './cost-calculator.controller';
+export * from './zonectl.controller';
+export * from './couponctl.controller';
+export * from './priceShipping.controller';

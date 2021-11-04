@@ -1,4 +1,4 @@
-import {ProyectoCApplication} from '../..';
+import {ShippingCostApplication} from '../..';
 import {
   createRestAppClient,
   givenHttpServerConfig,
@@ -14,7 +14,7 @@ export async function setupApplication(): Promise<AppWithClient> {
     // port: +process.env.PORT,
   });
 
-  const app = new ProyectoCApplication({
+  const app = new ShippingCostApplication({
     rest: restConfig,
   });
 
@@ -27,6 +27,6 @@ export async function setupApplication(): Promise<AppWithClient> {
 }
 
 export interface AppWithClient {
-  app: ProyectoCApplication;
+  app: ShippingCostApplication;
   client: Client;
 }

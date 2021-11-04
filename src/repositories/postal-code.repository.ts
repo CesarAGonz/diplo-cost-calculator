@@ -1,6 +1,6 @@
 import {inject} from '@loopback/core';
 import {DefaultCrudRepository} from '@loopback/repository';
-import {CityDataSource} from '../datasources';
+import {MongodbDataSource} from '../datasources';
 import {PostalCode, PostalCodeRelations} from '../models';
 
 export class PostalCodeRepository extends DefaultCrudRepository<
@@ -9,7 +9,7 @@ export class PostalCodeRepository extends DefaultCrudRepository<
   PostalCodeRelations
 > {
   constructor(
-    @inject('datasources.city') dataSource: CityDataSource,
+    @inject('datasources.mongodb') dataSource: MongodbDataSource,
   ) {
     super(PostalCode, dataSource);
   }

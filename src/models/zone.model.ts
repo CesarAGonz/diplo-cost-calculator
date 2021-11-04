@@ -1,6 +1,6 @@
 import {Entity, model, property} from '@loopback/repository';
 
-@model()
+@model({settings: {strict: false}})
 export class Zone extends Entity {
   @property({
     type: 'string',
@@ -20,21 +20,26 @@ export class Zone extends Entity {
     itemType: 'string',
     required: true,
   })
-  estates: string[];
+  states: string[];
 
   @property({
     type: 'object',
     required: true,
   })
-  priceKilo: object;
+  priceKilos: object;
 
   @property({
     type: 'array',
-    itemType: 'string',
+    itemType: 'number',
     required: true,
   })
-  shippingTime: string[];
+  shippingTime: number[];
 
+  // Define well-known properties here
+
+  // Indexer property to allow additional data
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [prop: string]: any;
 
   constructor(data?: Partial<Zone>) {
     super(data);

@@ -20,7 +20,7 @@ import {
 import {Zone} from '../models';
 import {ZoneRepository} from '../repositories';
 
-export class ZoneController {
+export class ZoneControllerController {
   constructor(
     @repository(ZoneRepository)
     public zoneRepository : ZoneRepository,
@@ -37,12 +37,12 @@ export class ZoneController {
         'application/json': {
           schema: getModelSchemaRef(Zone, {
             title: 'NewZone',
-            
+            exclude: ['id'],
           }),
         },
       },
     })
-    zone: Zone,
+    zone: Omit<Zone, 'id'>,
   ): Promise<Zone> {
     return this.zoneRepository.create(zone);
   }

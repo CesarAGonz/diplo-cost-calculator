@@ -1,9 +1,9 @@
-import {ApplicationConfig, ProyectoCApplication} from './application';
+import {ApplicationConfig, ShippingCostApplication} from './application';
 
 export * from './application';
 
 export async function main(options: ApplicationConfig = {}) {
-  const app = new ProyectoCApplication(options);
+  const app = new ShippingCostApplication(options);
   await app.boot();
   await app.start();
 

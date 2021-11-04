@@ -1,10 +1,10 @@
-import {ProyectoCApplication} from './application';
+import {ShippingCostApplication} from './application';
 
 export async function migrate(args: string[]) {
   const existingSchema = args.includes('--rebuild') ? 'drop' : 'alter';
   console.log('Migrating schemas (%s existing schema)', existingSchema);
 
-  const app = new ProyectoCApplication();
+  const app = new ShippingCostApplication();
   await app.boot();
   await app.migrateSchema({existingSchema});
 

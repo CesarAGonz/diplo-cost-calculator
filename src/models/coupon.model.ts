@@ -1,7 +1,7 @@
 import {Entity, model, property} from '@loopback/repository';
 
 @model({settings: {strict: false}})
-export class PostalCode extends Entity {
+export class Coupon extends Entity {
   @property({
     type: 'string',
     id: true,
@@ -10,20 +10,21 @@ export class PostalCode extends Entity {
   id?: string;
 
   @property({
-    type: 'number',
+    type: 'string',
     required: true,
   })
-  code: number;
+  name: string;
 
   @property({
     type: 'string',
   })
-  state?: string;
+  description?: string;
 
   @property({
     type: 'string',
+    required: true,
   })
-  city?: string;
+  code: string;
 
   // Define well-known properties here
 
@@ -31,13 +32,13 @@ export class PostalCode extends Entity {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [prop: string]: any;
 
-  constructor(data?: Partial<PostalCode>) {
+  constructor(data?: Partial<Coupon>) {
     super(data);
   }
 }
 
-export interface PostalCodeRelations {
+export interface CouponRelations {
   // describe navigational properties here
 }
 
-export type PostalCodeWithRelations = PostalCode & PostalCodeRelations;
+export type CouponWithRelations = Coupon & CouponRelations;
