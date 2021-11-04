@@ -4,8 +4,9 @@ import {juggler} from '@loopback/repository';
 const config = {
   name: 'mongodb',
   connector: 'mongodb',
-  // url: 'mongodb://prisma:prisma@localhost:27017/?authSource=admin',
-  url: 'mongodb://cgonzalezr:RPpqmsZSVvavuw@147.182.187.121:27017/scalderon_production?authSource=admin',
+  //url: 'mongodb://prisma:prisma@localhost:27017/?authSource=admin',
+  //url: 'mongodb://cgonzalezr:RPpqmsZSVvavuw@147.182.187.121:27017/cgonzalezr_production?authSource=admin',
+  url: 'mongodb://scalderon:wrtn5zU5oecdQ@147.182.187.121:27017/scalderon_production?authSource=admin',
   host: '',
   port: 0,
   user: '',
