@@ -1,9 +1,10 @@
 // Uncomment these imports to begin using these cool features!
 
 // import {inject} from '@loopback/core';
-import {repository} from '@loopback/repository';
+import {repository, Where} from '@loopback/repository';
 import {post, get, getModelSchemaRef, response, requestBody, param} from '@loopback/rest';
-import {PaymentData, Zone} from '../models';
+import * as Sentry from '@sentry/node';
+import {PaymentData, PostalCode, Zone} from '../models';
 import {
   CouponRepository,
   PostalCodeRepository,
@@ -36,20 +37,14 @@ export class ShippingCostController {
     })
     data: PaymentData,
   ): Promise<object> {
-    const stateFound = await this.postalCodeRepository.findOne({
+    /* const stateFound = await this.postalCodeRepository.findOne({
       where: {code: data.postalCode},
-    });
-    const zoneFound = await this.zoneRepository.findOne({
-      where: {states: stateFound?.state},
-    });
-    const couponFound = await this.couponRepository.findOne({
-      where: {code: data.coupon},
-    });
+    }); */
+    let zoneFound: Zone | undefined = undefined
     let shippingCost = 0;
-    const kilos = Math.trunc(data.weight);
-    if (data.cost > 10000) {
-      shippingCost = 0;
-    } else {
+    try {
+      zoneFound = await this.zoneRepository.findById(data.idZone);
+      const kilos = Math.trunc(data.weight);
       if (kilos <= 8) {
         shippingCost = (zoneFound?.priceKilos as Record<string, number>)[
           Math.trunc(kilos).toString()
@@ -61,91 +56,16 @@ export class ShippingCostController {
           (extraKilos *
             (zoneFound?.priceKilos as Record<string, number>)['extra']);
       }
+    } catch (error) {
+      Sentry.captureException(error)
     }
-    if (
-      zoneFound?.name === 'Zona 4' &&
-      data.cost > 3000 &&
-      data.paymentMethod === 'visa'
-    ) {
-      return {
-        shippingCost: 0,
-        cost: data.cost,
-        total: data.cost,
-        estimatedTime: zoneFound?.shippingTime
-      };
-    }
-    if (
-      zoneFound?.name === 'Zona 3' &&
-      data.cost > 4000 &&
-      data.paymentMethod === 'visa'
-    ) {
-      const cost = data.cost * 0.85;
-      return {
-        shippingCost,
-        cost: cost,
-        total: cost,
-        estimatedTime: zoneFound?.shippingTime
-      };
-    }
-    if (
-      (zoneFound?.name === 'Zona 1' || zoneFound?.name === 'Zone 2') &&
-      data.paymentMethod === 'mastercard' &&
-      couponFound &&
-      couponFound?.name === 'MASTER20'
-    ) {
-      const cost = data.cost * 0.9;
-      return {
-        shippingCost,
-        cost: cost,
-        total: cost + shippingCost,
-        estimatedTime: zoneFound?.shippingTime
-      };
-    }
-    if (
-      (zoneFound?.name === 'Zona 1' ||
-        zoneFound?.name === 'Zona 2' ||
-        zoneFound?.name === 'Zona 3') &&
-      (data.paymentMethod === 'visa' || data.paymentMethod === 'mastercard') &&
-      couponFound &&
-      couponFound?.name === 'PERRITOFELI'
-    ) {
-      const shippingDiscount = shippingCost * 0.85;
-      return {
-        shippingCost: shippingDiscount,
-        cost: data.cost,
-        total: data.cost + shippingDiscount,
-        estimatedTime: zoneFound?.shippingTime
-      };
-    }
-    if (zoneFound?.name === 'Zona 5' && data.paymentMethod === 'mastercard') {
-      return {
-        shippingCost,
-        cost: data.cost,
-        total: data.cost + shippingCost,
-        estimatedTime: zoneFound?.shippingTime
-      };
-    }
-    if (
-      (zoneFound?.name === 'Zona 4' || zoneFound?.name === 'Zona 5') &&
-      couponFound &&
-      couponFound?.name === 'NOJADO'
-    ) {
-      const cost = data.cost * 0.85;
-      return {
-        shippingCost,
-        cost: cost,
-        total: cost + shippingCost,
-        estimatedTime: zoneFound?.shippingTime
-      };
-    }
+    shippingCost = (shippingCost * data.discount) / 100
     return {
       shippingCost,
-      cost: data.cost,
-      total: data.cost + shippingCost,
-      estimatedTime: zoneFound?.shippingTime
-    };
+      shippingTime: zoneFound?.shippingTime
+    }
   }
-  @get('/getZone/{postalCode}')
+  @get('/getZone')
   @response(200, {
     description: 'get zone by postal code',
     content: {
@@ -155,17 +75,26 @@ export class ShippingCostController {
     },
   })
   async getZone(
-    @param.path.string('postalCode') postalCode: string
+    @param.where(PostalCode) where?: Where<Zone>,
   ): Promise<Zone | {}> {
-    const stateFound = await this.postalCodeRepository.findOne({
-      where: {code: postalCode},
-    });
-    const zoneFound = await this.zoneRepository.findOne({
-      where: {states: stateFound?.state},
-    });
-    if (zoneFound) {
-      return zoneFound
+    let res = {}
+    try {
+      const stateFound = await this.postalCodeRepository.find({
+        where: where,
+      });
+      const zoneFound = await this.zoneRepository.find({
+        where: {states: stateFound[0]?.state},
+      });
+      if (zoneFound[0]) {
+        res = {
+          name: zoneFound[0].name,
+          id: zoneFound[0].id,
+          state: stateFound[0].state
+        }
+      }
+    } catch (error) {
+      Sentry.captureException(error)
     }
-    return {}
+    return res
   }
 }

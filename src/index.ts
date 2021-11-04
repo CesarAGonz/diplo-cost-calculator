@@ -1,8 +1,18 @@
 import {ApplicationConfig, ShippingCostApplication} from './application';
+import * as Sentry from "@sentry/node";
 
 export * from './application';
 
 export async function main(options: ApplicationConfig = {}) {
+
+  Sentry.init({
+    dsn: "https://examplePublicKey@o0.ingest.sentry.io/0",
+
+    // We recommend adjusting this value in production, or using tracesSampler
+    // for finer control
+    tracesSampleRate: 1.0,
+  });
+  
   const app = new ShippingCostApplication(options);
   await app.boot();
   await app.start();
