@@ -12,6 +12,7 @@
     "node": ">=10.16"
   },
   "scripts": {
+    "start:prod": "node dist/index.js",
     "build": "lb-tsc",
     "build:watch": "lb-tsc --watch",
     "lint": "npm run eslint && npm run prettier:check",
